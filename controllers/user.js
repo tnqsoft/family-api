@@ -1,7 +1,8 @@
 var express = require('express'),
     _ = require('lodash'),
     router = express.Router(),
-    jwtHelper = require('../helper/jwt');
+    jwtHelper = require('../helpers/jwt'),
+    userModel = require('../models/user');
 
 var app = module.exports = express.Router();
 
@@ -29,32 +30,38 @@ router.post('/authenticate', function(req, res, next) {
         });
     }
 
-    var user = _.find(users, {
-        username: username
+    userModel.findByUsername(username).then(function(rows) {
+      res.status(200).send(rows);
     });
 
-    if (!user) {
-        return res.status(401).send({
-            code: 401,
-            message: "The username or password don't match"
-        });
-    }
-
-    if ((user.password !== password)) {
-        return res.status(401).send({
-            code: 401,
-            message: "The username or password don't match"
-        });
-    }
-
-    res.status(200).send({
-        token: jwtHelper.create(user, remember)
-    });
+    // var user = _.find(users, {
+    //     username: username
+    // });
+    //
+    // if (!user) {
+    //     return res.status(401).send({
+    //         code: 401,
+    //         message: "The username or password don't match"
+    //     });
+    // }
+    //
+    // if ((user.password !== password)) {
+    //     return res.status(401).send({
+    //         code: 401,
+    //         message: "The username or password don't match"
+    //     });
+    // }
+    //
+    // res.status(200).send({
+    //     token: jwtHelper.create(user, remember)
+    // });
 });
 // -----------------------------------------------------------------------
 // Get User list
 router.get('/api/user', function(req, res) {
-  res.status(200).send(users);
+    userModel.list().then(function(rows) {
+      res.status(200).send(rows);
+    });
 });
 // -----------------------------------------------------------------------
 

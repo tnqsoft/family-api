@@ -10,7 +10,7 @@ var jwt = require('jsonwebtoken');
 var configs = require('./configs');
 
 //var index = require('./routes/index');
-var users = require('./controllers/users');
+var users = require('./controllers/user');
 
 var app = express();
 
