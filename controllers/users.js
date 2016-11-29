@@ -1,6 +1,6 @@
 var express = require('express'),
     _ = require('lodash'),
-    //router = express.Router(),
+    router = express.Router(),
     jwtHelper = require('../helper/jwt');
 
 var app = module.exports = express.Router();
@@ -17,11 +17,11 @@ var users = [{
 
 // -----------------------------------------------------------------------
 // Authenticate
-app.post('/authenticate', function(req, res, next) {
+router.post('/authenticate', function(req, res, next) {
     let username = req.body.username;
     let password = req.body.password;
     let remember = req.body.remember;
-console.log(username);
+
     if (username === '' || password === '') {
         return res.status(400).send({
             code: 400,
@@ -52,5 +52,10 @@ console.log(username);
     });
 });
 // -----------------------------------------------------------------------
+// Get User list
+router.get('/api/user', function(req, res) {
+  res.status(200).send(users);
+});
+// -----------------------------------------------------------------------
 
-//module.exports = router;
+module.exports = router;
