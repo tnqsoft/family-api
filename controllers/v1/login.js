@@ -3,7 +3,8 @@ var express = require('express'),
     router = express.Router(),
     jwtHelper = require('../../helpers/jwt'),
     userModel = require('../../models/user'),
-    util = require('util');
+    util = require('util'),
+    passwordHash = require('password-hash');
 
 // -----------------------------------------------------------------------
 /**
@@ -33,22 +34,20 @@ var express = require('express'),
  *     }
  *
  * @apiErrorExample {json} Error-Response:
- *     HTTP/1.1 404 Not Found
- *     {
- *       "code": 404,
- *       "message": "User not found."
- *     }
- *
  *     HTTP/1.1 400 Bad Request
  *     {
  *       "code": 400,
- *       "message": "You must send the username and the password."
+ *       "message": "Input invalid"
  *     }
- *
  *     HTTP/1.1 401 Unauthorized
  *     {
  *       "code": 401,
  *       "message": "The username or password don't match."
+ *     }
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "code": 404,
+ *       "message": "User not found."
  *     }
  */
 router.post('/authenticate', function(req, res, next) {
@@ -78,7 +77,7 @@ router.post('/authenticate', function(req, res, next) {
 
           var user = rows[0];
 
-          if ((user.password !== password)) {
+          if (passwordHash.verify(password, user.password) === false) {
               return res.status(401).send({
                   code: 401,
                   message: "The username or password don't match."

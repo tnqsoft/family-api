@@ -8,6 +8,7 @@ var cors = require('cors');
 var jwt = require('jsonwebtoken');
 var configs = require('./configs');
 var expressValidator = require('express-validator');
+var ip = require('ip');
 
 //var index = require('./routes/index');
 var loginV1 = require('./controllers/v1/login');
@@ -70,7 +71,7 @@ apiRoutes.use(function(req, res, next) {
     if (token) {
         // verifies secret and checks exp
         jwt.verify(token, app.get('secret'), function(err, decoded) {
-            if (err) {
+            if (err || typeof decoded.ip === 'undefined' || (typeof decoded.ip !== 'undefined' && ip.isEqual(ip.address(), decoded.ip) === false)) {
                 return res.status(401).send({
                     code: 401,
                     message: 'Failed to authenticate token.'
