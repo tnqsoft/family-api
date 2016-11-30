@@ -4,61 +4,66 @@ var express = require('express'),
     jwtHelper = require('../helpers/jwt'),
     userModel = require('../models/user');
 
-var app = module.exports = express.Router();
-
-var users = [{
-    id: 1,
-    username: 'test',
-    password: 'test'
-}, {
-    id: 2,
-    username: 'test2',
-    password: 'test2'
-}];
+// var users = [{
+//     id: 1,
+//     username: 'test',
+//     password: 'test'
+// }, {
+//     id: 2,
+//     username: 'test2',
+//     password: 'test2'
+// }];
+// var user = _.find(users, {
+//     username: username
+// });
 
 // -----------------------------------------------------------------------
-// Authenticate
-router.post('/authenticate', function(req, res, next) {
-    let username = req.body.username;
-    let password = req.body.password;
-    let remember = req.body.remember;
+/**
+ * @apiDefine UserModel
+ * @apiSuccess {number} id User indentity.
+ * @apiSuccess {string} username Username.
+ * @apiSuccess {string} password Password.
+ * @apiSuccess {string} email Email.
+ * @apiSuccess {number} is_active User status.
+ * @apiSuccess {datetime} created_at Created at.
+ * @apiSuccess {datetime} updated_at Updated at.
+ */
 
-    if (username === '' || password === '') {
-        return res.status(400).send({
-            code: 400,
-            message: "You must send the username and the password"
-        });
-    }
-
-    userModel.findByUsername(username).then(function(rows) {
-      res.status(200).send(rows);
-    });
-
-    // var user = _.find(users, {
-    //     username: username
-    // });
-    //
-    // if (!user) {
-    //     return res.status(401).send({
-    //         code: 401,
-    //         message: "The username or password don't match"
-    //     });
-    // }
-    //
-    // if ((user.password !== password)) {
-    //     return res.status(401).send({
-    //         code: 401,
-    //         message: "The username or password don't match"
-    //     });
-    // }
-    //
-    // res.status(200).send({
-    //     token: jwtHelper.create(user, remember)
-    // });
-});
-// -----------------------------------------------------------------------
-// Get User list
-router.get('/api/user', function(req, res) {
+/**
+ * @api {get} /api/user Get User list
+ * @apiName GetUserList
+ * @apiGroup User
+ * @apiVersion 1.0.0
+ * @apiPermission Member
+ *
+ * @apiHeaderExample {json} Header-Example:
+ *     {
+ *       "Content-Type": "application/json",
+ *       "Authorization": "Bearer TokenString"
+ *     }
+ *
+ * @apiUse UserModel
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     [{
+ *       "id": 1,
+ *       "username": "test",
+ *       "password": "test",
+ *       "email": "tuanquynh0508@gmail.com",
+ *       "is_active": 1,
+ *       "created_at": "2016-11-30T02:29:47.000Z",
+ *       "updated_at": "2016-11-30T02:29:47.000Z"
+ *     }]
+ *
+ * @apiErrorExample {json} Error-Response:
+ *     HTTP/1.1 401 Unauthorized
+ *     {
+ *       "code": 401,
+ *       "message": "Failed to authenticate token."
+ *     }
+ */
+router.get('/', function(req, res) {
     userModel.list().then(function(rows) {
       res.status(200).send(rows);
     });

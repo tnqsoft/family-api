@@ -4,13 +4,13 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
 var configs = require('./configs');
 
 //var index = require('./routes/index');
-var users = require('./controllers/user');
+var login = require('./controllers/login');
+var user = require('./controllers/user');
 
 var app = express();
 
@@ -63,8 +63,8 @@ apiRoutes.use(function(req, res, next) {
         // verifies secret and checks exp
         jwt.verify(token, app.get('secret'), function(err, decoded) {
             if (err) {
-                return res.json({
-                    success: false,
+                return res.status(401).send({
+                    code: 401,
                     message: 'Failed to authenticate token.'
                 });
             } else {
@@ -76,9 +76,9 @@ apiRoutes.use(function(req, res, next) {
     } else {
         // if there is no token
         // return an error
-        return res.status(403).send({
-            success: false,
-            message: 'No token provided.'
+        return res.status(401).send({
+            code: 401,
+            message: 'Failed to authenticate token.'
         });
     }
 });
@@ -96,7 +96,9 @@ app.use(require('node-sass-middleware')({
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', express.static(path.join(__dirname, 'doc')));
 
-app.use(users);
+// Import Controllers
+app.use(login);
+app.use('/api/user', user);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
