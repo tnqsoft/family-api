@@ -7,12 +7,14 @@ var bodyParser = require('body-parser');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
 var configs = require('./configs');
+var expressValidator = require('express-validator');
 
 //var index = require('./routes/index');
-var login = require('./controllers/login');
-var user = require('./controllers/user');
+var loginV1 = require('./controllers/v1/login');
+var userV1 = require('./controllers/v1/user');
 
 var app = express();
+var apiV1 = express.Router();
 
 // Set config---------------------------------------------------
 app.set('secret', configs.secret);
@@ -41,12 +43,18 @@ app.use(bodyParser.raw({
     verify: rawBodySaver,
     type: '*/*'
 }));
+app.use(expressValidator());
 
 // Check JWT----------------------------------------------------
 // get an instance of the router for api routes
 var apiRoutes = express.Router();
 // route middleware to verify a token
 apiRoutes.use(function(req, res, next) {
+    //Except login api
+    if (/^(.*)\/authenticate$/.test(req.url)) {
+        next();
+        return true;
+    }
     // check header or url parameters or post parameters for token
     var tokenRegex = /^Bearer\s([a-zA-Z0-9\._\-\=]+)$/;
     var token = null;
@@ -97,8 +105,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', express.static(path.join(__dirname, 'doc')));
 
 // Import Controllers
-app.use(login);
-app.use('/api/user', user);
+apiV1.use(loginV1);
+apiV1.use('/user', userV1);
+app.use('/api/v1', apiV1);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
