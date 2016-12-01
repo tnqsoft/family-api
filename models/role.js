@@ -1,30 +1,14 @@
 var condb = require('../helpers/db'),
     utitlity = require('../helpers/utility'),
-    Promise = require('promise'),
-    passwordHash = require('password-hash');
+    Promise = require('promise');
 
-var userModel = {
-    tableName: 'tbl_user',
+var roleModel = {
+    tableName: 'tbl_role',
     list: function() {
         var _this = this;
         var sql = 'SELECT * FROM ' + _this.tableName;
         return new Promise(function(resolve, reject) {
             condb.query(sql,
-                function(err, rows, fields) {
-                    if (err) {
-                        reject(err);
-                    }
-                    resolve(rows);
-                });
-        });
-    },
-    findByUsername: function(username) {
-        var _this = this;
-        var sql = 'SELECT * FROM ' + _this.tableName + ' WHERE username = :username LIMIT 0,1';
-        return new Promise(function(resolve, reject) {
-            condb.query(sql, {
-                    username: username
-                },
                 function(err, rows, fields) {
                     if (err) {
                         reject(err);
@@ -48,11 +32,11 @@ var userModel = {
                 });
         });
     },
-    create: function(user) {
+    create: function(record) {
         var _this = this;
-        var sql = 'INSERT INTO ' + _this.tableName + ' SET username = :username, password = :password, email = :email, is_active = :is_active, created_at = :created_at';
+        var sql = 'INSERT INTO ' + _this.tableName + ' SET name = :name, created_at = :created_at';
         return new Promise(function(resolve, reject) {
-            var query = condb.query(sql, user,
+            var query = condb.query(sql, record,
                 function(err, rows, fields) {
                     if (err) {
                         reject(err);
@@ -66,67 +50,27 @@ var userModel = {
             //console.log(query.sql);
         });
     },
-    update: function(user) {
+    update: function(record) {
         var _this = this;
-        var sql = 'UPDATE ' + _this.tableName + ' SET username = :username, email = :email, is_active = :is_active, updated_at = :updated_at';
-        if (user.password !== '' && user.password !== null) {
-            user.password = passwordHash.generate(user.password);
-            sql += ', password = :password';
-        }
-        sql += ' WHERE id = :id';
+        var sql = 'UPDATE ' + _this.tableName + ' SET name = :name, updated_at = :updated_at WHERE id = :id';
         return new Promise(function(resolve, reject) {
-            _this.findById(user.id).then(function(rows) {
+            _this.findById(record.id).then(function(rows) {
                 if (rows.length === 0) {
                     reject({
                         code: 404,
                         message: 'Record is not found.'
                     });
                 }
-                var query = condb.query(sql, user,
+                var query = condb.query(sql, record,
                     function(err, rows, fields) {
                         if (err) {
                             reject(err);
                         }
-                        _this.findById(user.id).then(function(rows) {
+                        _this.findById(record.id).then(function(rows) {
                             resolve(rows[0]);
                         }, function(err) {
                             reject(err);
                         });
-                    });
-                //console.log(query.sql);
-            }, function(err) {
-                reject(err);
-            });
-        });
-    },
-    changePassword: function(id, oldPassword, newPassword) {
-        var _this = this;
-        var sql = 'UPDATE ' + _this.tableName + ' SET password = :password, updated_at = :updated_at WHERE id = :id';
-        return new Promise(function(resolve, reject) {
-            _this.findById(id).then(function(rows) {
-                if (rows.length === 0) {
-                    reject({
-                        code: 404,
-                        message: 'Record is not found.'
-                    });
-                }
-                if (passwordHash.verify(oldPassword, rows[0].password) === false) {
-                    reject({
-                        code: 400,
-                        message: 'Input wrong old password.'
-                    });
-                }
-                var dataUpdate = {
-                    id: id,
-                    password: newPassword,
-                    updated_at: utitlity.getNow()
-                };
-                var query = condb.query(sql, dataUpdate,
-                    function(err, rows, fields) {
-                        if (err) {
-                            reject(err);
-                        }
-                        resolve();
                     });
                 //console.log(query.sql);
             }, function(err) {
@@ -163,4 +107,4 @@ var userModel = {
     }
 };
 
-module.exports = userModel;
+module.exports = roleModel;

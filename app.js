@@ -13,6 +13,7 @@ var ip = require('ip');
 //var index = require('./routes/index');
 var loginV1 = require('./controllers/v1/login');
 var userV1 = require('./controllers/v1/user');
+var roleV1 = require('./controllers/v1/role');
 
 var app = express();
 var apiV1 = express.Router();
@@ -108,6 +109,7 @@ app.use('/', express.static(path.join(__dirname, 'doc')));
 // Import Controllers
 apiV1.use(loginV1);
 apiV1.use('/user', userV1);
+apiV1.use('/role', roleV1);
 app.use('/api/v1', apiV1);
 
 // catch 404 and forward to error handler
