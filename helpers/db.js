@@ -1,10 +1,12 @@
 var mysql = require('mysql');
+var configs = require('../configs');
 
 var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '123456',
-    database: 'family'
+    host: configs.database.host,
+    user: configs.database.user,
+    password: configs.database.password,
+    database: configs.database.database,
+    multipleStatements: configs.database.multipleStatements,
 });
 
 connection.connect();
@@ -18,5 +20,9 @@ connection.config.queryFormat = function(query, values) {
         return txt;
     }.bind(this));
 };
+
+process.on('exit', function() {
+    connection.end();
+});
 
 module.exports = connection;

@@ -1,3 +1,11 @@
 {
-  "secret": "conghoaxahoichunghiavietnam"
+  "secret": "conghoaxahoichunghiavietnam",
+  "timezone": "+07:00",
+  "database": {
+    "host": "localhost",
+    "user": "root",
+    "password": "123456",
+    "database": "family",
+    "multipleStatements": true
+  }
 }

@@ -5,7 +5,7 @@ var express = require('express'),
 
 var utility = {
     getNow: function() {
-        moment().utcOffset("+07:00");
+        moment().utcOffset(configs.timezone);
         return moment().format();
     }
 };
